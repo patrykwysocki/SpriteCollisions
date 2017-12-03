@@ -42,19 +42,23 @@ int main()
 		DEBUG_MSG("Failed to load file");
 		return EXIT_FAILURE;
 	}
-	// Setup a mouse Sprite
-	sf::Sprite rayForCollision;
-	rayForCollision.setTexture(ray_texture);
-	rayForCollision.setPosition(20, 400);
-
+	
+	// Setup a mouse Rectangle Sprite
 	sf::Sprite mouse;
 	mouse.setTexture(mouse_texture);
 
+	// Setup a mouse Circle Sprite
 	sf::CircleShape mouseCircle;
 	mouseCircle.setRadius(40);
 	mouseCircle.setFillColor(sf::Color::Red);
 	mouseCircle.setOrigin(30, 30);
 
+	// Setup a mouse Circle Sprite
+	sf::Sprite mouseRay;
+	mouseRay.setTexture(ray_texture);
+
+
+	//Collision on screen sprites.
 	sf::Sprite capsuleForCollision;
 	capsuleForCollision.setTexture(capsule_texture);
 	capsuleForCollision.setPosition(300, 50);
@@ -66,8 +70,11 @@ int main()
 	sf::CircleShape circleForCollision;
 	circleForCollision.setRadius(50);
 	circleForCollision.setFillColor(sf::Color::Blue);
-	circleForCollision.setPosition(700, 300);
+	circleForCollision.setPosition(500, 250);
 	
+	sf::Sprite rayForCollision;
+	rayForCollision.setTexture(ray_texture);
+	rayForCollision.setPosition(20, 400);
 
 
 	//movement of user aabb/circle/ray
@@ -82,6 +89,9 @@ int main()
 	circle_mouse.r = mouseCircle.getRadius();
 
 	c2Ray ray_mouse;
+	ray_mouse.p = c2V(mouseRay.getPosition().x, mouseRay.getPosition().y);
+	ray_mouse.d=c2Norm(c2V(0,1));
+	ray_mouse.t=50;
 	
 	// Setup Players Default Animated Sprite
 	AnimatedSprite animated_sprite(sprite_sheet);
@@ -144,13 +154,17 @@ int main()
 		// Move Sprite Follow Mouse(circle)
 		mouseCircle.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 
+		// Move Sprite Follow Mouse(ray)
+		mouseRay.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
 		// Update mouse AABB
 		aabb_mouse.min = c2V(mouse.getPosition().x, mouse.getPosition().y);
 		aabb_mouse.max = c2V(mouse.getPosition().x + mouse.getGlobalBounds().width, mouse.getPosition().y + mouse.getGlobalBounds().width);
 
 		//update mouse circle
 		circle_mouse.p = c2V(mouseCircle.getPosition().x, mouseCircle.getPosition().y);
-	
+		
+		//update mouse ray
+		ray_mouse.p= c2V(mouseRay.getPosition().x, mouseRay.getPosition().y);
 		// Process events
 		sf::Event event;
 		while (window.pollEvent(event))
@@ -266,18 +280,28 @@ int main()
 			
 			
 		}
+		if (shapeNumber == 3)
+		{
+			c2Raycast cast;
+			result = c2RaytoAABB(ray_mouse, aabb_player, &cast);
+			if (result) {
+				cout << ((result != 0) ? ("Collision RAY TO AABB") : "") << endl;
+			}
+			result = c2RaytoCapsule(ray_mouse, capsule_player, &cast);
+			if (result) {
+				cout << ((result != 0) ? ("Collision RAY TO CAPSULE") : "") << endl;
+			}
+			result = c2RaytoCircle(ray_mouse, circle_player, &cast);
+			if (result) {
+				cout << ((result != 0) ? ("Collision RAY TO CIRCLE") : "") << endl;
+			}
+			result = c2RaytoPoly(ray_mouse, &poly_player, NULL, &cast);
+			if (result) {
+				cout << ((result != 0) ? ("Collision RAY TO POLY") : "") << endl;
+			}
+		}
+
 	
-	
-
-
-		//cout << ((result != 0) ? ("Collision") : "") << endl;
-		//if (result){
-		//	player.getAnimatedSprite().setColor(sf::Color(255,0,0));
-		//}
-		//else {
-		//	player.getAnimatedSprite().setColor(sf::Color(0, 255, 0));
-		//}
-
 		// Clear screen
 		window.clear();
 
@@ -291,7 +315,10 @@ int main()
 		{
 			window.draw(mouseCircle);
 		}
-		
+		if (shapeNumber == 3)
+		{
+			window.draw(mouseRay);
+		}
 		window.draw(circleForCollision);
 		window.draw(capsuleForCollision);
 		window.draw(rayForCollision);
