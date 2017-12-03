@@ -91,7 +91,7 @@ int main()
 	c2Ray ray_mouse;
 	ray_mouse.p = c2V(mouseRay.getPosition().x, mouseRay.getPosition().y);
 	ray_mouse.d=c2Norm(c2V(0,1));
-	ray_mouse.t=50;
+	ray_mouse.t=40;
 	
 	// Setup Players Default Animated Sprite
 	AnimatedSprite animated_sprite(sprite_sheet);
@@ -120,7 +120,7 @@ int main()
 	c2Ray ray_player;
 	ray_player.p = c2V(20, 400);
 	ray_player.d = c2Norm(c2V(0, 1));
-	ray_player.t = 50;
+	ray_player.t = 40;
 
 	c2Circle circle_player;
 	circle_player.p = c2V(circleForCollision.getPosition().x, circleForCollision.getPosition().y);
@@ -156,6 +156,7 @@ int main()
 
 		// Move Sprite Follow Mouse(ray)
 		mouseRay.setPosition(window.mapPixelToCoords(sf::Mouse::getPosition(window)));
+
 		// Update mouse AABB
 		aabb_mouse.min = c2V(mouse.getPosition().x, mouse.getPosition().y);
 		aabb_mouse.max = c2V(mouse.getPosition().x + mouse.getGlobalBounds().width, mouse.getPosition().y + mouse.getGlobalBounds().width);
@@ -253,12 +254,11 @@ int main()
 		if(shapeNumber==2)
 		{
 			result = c2CircletoAABB(circle_mouse, aabb_player);
-			if (result) {
-				cout << ((result != 0) ? ("Collision CIRCLE TO AABB") : "") << endl;
-			}
+			cout << ((result != 0) ? ("Collision CIRCLE TO AABB") : "") << endl;
 
 			result = c2CircletoCircle(circle_player, circle_mouse);
-			if (result) {
+			if (result) 
+			{
 				cout << ((result != 0) ? ("Collision CIRCLE TO CIRCLE") : "") << endl;
 			}
 			c2Raycast cast;
@@ -276,7 +276,8 @@ int main()
 			if (result)
 			{
 				cout << ((result != 0) ? ("Collision CIRCLE TO POLY") : "") << endl;
-			}
+			}			
+
 			
 			
 		}
@@ -284,20 +285,29 @@ int main()
 		{
 			c2Raycast cast;
 			result = c2RaytoAABB(ray_mouse, aabb_player, &cast);
-			if (result) {
-				cout << ((result != 0) ? ("Collision RAY TO AABB") : "") << endl;
+			cout << ((result != 0) ? ("Collision RAY TO AABB") : "") << endl;
+			if (result)
+			{
+
+
 			}
 			result = c2RaytoCapsule(ray_mouse, capsule_player, &cast);
-			if (result) {
+			if (result) 
+			{
 				cout << ((result != 0) ? ("Collision RAY TO CAPSULE") : "") << endl;
+
 			}
 			result = c2RaytoCircle(ray_mouse, circle_player, &cast);
-			if (result) {
+			if (result) 
+			{
 				cout << ((result != 0) ? ("Collision RAY TO CIRCLE") : "") << endl;
+
 			}
 			result = c2RaytoPoly(ray_mouse, &poly_player, NULL, &cast);
-			if (result) {
+			if (result) 
+			{
 				cout << ((result != 0) ? ("Collision RAY TO POLY") : "") << endl;
+
 			}
 		}
 
